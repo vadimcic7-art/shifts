@@ -4,90 +4,133 @@
 <meta charset="UTF-8">
 <title>График смен · 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#161A20">
+<meta name="theme-color" content="#1B2A56">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F5F6F8; --card:#FFFFFF;
-    --ink:#161A20; --ink-2:#5C6673; --ink-3:#98A2B0;
-    --line:#E3E7EC; --line-2:#EFF2F5;
+    --bg:#EEF1F6; --card:#FFFFFF; --card-2:#F6F8FB;
+    --ink:#12151C; --ink-2:#4B5567; --ink-3:#8791A3;
+    --line:#DCE2EC; --line-2:#EAEFF6;
+    --chrome:#1B2A56; --chrome-2:#2C3F7A; --chrome-soft:rgba(27,42,86,.08);
     --rl:#D42027; --rl-n:#243B6B; --wl:#0E9F6E; --wl-n:#1668C7; --vac:#E8A317;
-    --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --weekend:#C0503E;
+    --f-display:'Unbounded',-apple-system,sans-serif;
+    --f-body:'Golos Text',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --f-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
   }
   @media (prefers-color-scheme:dark){
-    :root{ --bg:#12151A; --card:#1B1F27; --ink:#F2F4F7; --ink-2:#A6B0BD; --ink-3:#6B7583;
-      --line:#2A2F3A; --line-2:#22262F; }
+    :root:not([data-theme="light"]){
+      --bg:#0A0D13; --card:#151A24; --card-2:#10141C;
+      --ink:#EDEFF4; --ink-2:#9BA3B4; --ink-3:#626B7E;
+      --line:#242B3A; --line-2:#1A1F2B;
+      --chrome-soft:rgba(122,148,224,.14);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0A0D13; --card:#151A24; --card-2:#10141C;
+    --ink:#EDEFF4; --ink-2:#9BA3B4; --ink-3:#626B7E;
+    --line:#242B3A; --line-2:#1A1F2B;
+    --chrome-soft:rgba(122,148,224,.14);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  @media (prefers-reduced-motion:no-preference){
+    .cal,.rows-in{animation:rise .32s cubic-bezier(.2,.7,.3,1);}
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
   html,body{margin:0;padding:0;}
-  body{background:var(--bg);color:var(--ink);font-family:var(--font);
-    padding:16px 14px calc(24px + env(safe-area-inset-bottom));
-    max-width:520px;margin:0 auto;-webkit-text-size-adjust:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f-body);
+    padding:14px 14px calc(28px + env(safe-area-inset-bottom));
+    max-width:500px;margin:0 auto;-webkit-text-size-adjust:100%;}
 
-  .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
-  .top h1{font-size:19px;font-weight:800;margin:0;letter-spacing:-.01em;}
-  .top .yr{font-size:13px;font-weight:800;color:var(--ink-3);}
+  .eyebrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:0 2px;}
+  .eyebrow .lb{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);}
+  .eyebrow .yr{font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--ink-3);
+    background:var(--card-2);border:1px solid var(--line);border-radius:6px;padding:2px 7px;}
 
-  .nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
-  .nav button{flex:0 0 auto;width:46px;height:46px;border-radius:14px;border:1.5px solid var(--line);
-    background:var(--card);color:var(--ink);font-size:22px;font-weight:800;line-height:1;cursor:pointer;}
-  .nav button:active{background:var(--line-2);}
-  .nav .mlabel{flex:1;text-align:center;font-size:17px;font-weight:800;}
+  .board{position:relative;background:linear-gradient(155deg,var(--chrome),var(--chrome-2));
+    border-radius:18px;padding:14px 8px 20px;display:flex;align-items:center;gap:6px;
+    box-shadow:0 10px 24px -12px rgba(20,30,60,.5);}
+  .board button{flex:0 0 auto;width:42px;height:42px;border-radius:12px;border:none;
+    background:rgba(255,255,255,.14);color:#fff;font-size:20px;font-weight:700;line-height:1;cursor:pointer;}
+  .board button:active{background:rgba(255,255,255,.26);}
+  .board button:disabled{opacity:.3;}
+  .board .mlabel{flex:1;text-align:center;font-family:var(--f-display);font-size:16px;font-weight:700;
+    color:#fff;letter-spacing:.01em;text-wrap:balance;}
+  .board::after{content:"";position:absolute;left:16px;right:16px;bottom:0;height:8px;
+    background-image:radial-gradient(circle,var(--bg) 3.2px,transparent 3.2px);
+    background-size:14px 8px;background-position:0 -4px;background-repeat:repeat-x;}
 
-  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
-  .dow{font-size:11px;font-weight:800;letter-spacing:.03em;color:var(--ink-3);
-    text-transform:uppercase;text-align:center;padding-bottom:2px;}
-  .day{background:var(--card);border:1.4px solid var(--line);border-radius:11px;
-    min-height:52px;padding:5px 5px 6px;display:flex;flex-direction:column;gap:3px;}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:16px;}
+  .dow{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--ink-3);
+    text-transform:uppercase;text-align:center;padding-bottom:3px;}
+  .day{background:var(--card);border:1.4px solid var(--line);border-radius:10px;
+    min-height:54px;padding:5px 5px 6px;display:flex;flex-direction:column;gap:3px;}
   .day.blank{background:none;border:none;}
   .day.off{background:var(--line-2);}
-  .day.today{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset;}
-  .dnum{font-size:12px;font-weight:800;color:var(--ink-3);line-height:1;}
+  .day.today{border-color:var(--chrome);background:var(--chrome-soft);
+    box-shadow:0 0 0 1.5px var(--chrome) inset;}
+  .dnum{font-family:var(--f-mono);font-size:12.5px;font-weight:700;color:var(--ink-3);
+    line-height:1;font-variant-numeric:tabular-nums;}
   .day.today .dnum{color:var(--ink);}
-  .day.weekend .dnum{color:#C0503E;}
+  .day.weekend .dnum{color:var(--weekend);}
   .day.planned .bar{opacity:.45;}
 
-  .bar{height:10px;border-radius:4px;}
-  .bar.rl.day{background:var(--rl);} .bar.rl.night{background:var(--rl-n);}
-  .bar.wl.day{background:var(--wl);} .bar.wl.night{background:var(--wl-n);}
-  .bar.rl.vac,.bar.wl.vac{background:var(--vac);}
+  .bar{height:8px;border-radius:3px;}
+  .bar.rl.sd{background:var(--rl);} .bar.rl.sn{background:var(--rl-n);}
+  .bar.wl.sd{background:var(--wl);} .bar.wl.sn{background:var(--wl-n);}
+  .bar.rl.sv,.bar.wl.sv{background:var(--vac);}
 
-  .list{margin-top:18px;}
-  .list h2{font-size:13px;font-weight:800;color:var(--ink-2);text-transform:uppercase;
-    letter-spacing:.04em;margin:0 0 8px;}
-  .row{display:flex;align-items:center;gap:10px;background:var(--card);border:1.4px solid var(--line);
-    border-radius:12px;padding:10px 12px;margin-bottom:7px;}
-  .row .d{flex:0 0 44px;text-align:center;}
-  .row .d .dd{font-size:17px;font-weight:800;line-height:1;}
-  .row .d .dw{font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;margin-top:2px;}
-  .row .tags{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
-  .tag{font-size:12px;font-weight:800;padding:4px 9px;border-radius:8px;color:#fff;white-space:nowrap;}
-  .tag.rl.day{background:var(--rl);} .tag.rl.night{background:var(--rl-n);}
-  .tag.wl.day{background:var(--wl);} .tag.wl.night{background:var(--wl-n);}
-  .tag.vac{background:var(--vac);}
+  .list{margin-top:22px;}
+  .list h2{font-family:var(--f-display);font-size:12px;font-weight:700;color:var(--ink-2);
+    text-transform:uppercase;letter-spacing:.07em;margin:0 0 9px;}
+
+  .row{position:relative;display:flex;align-items:stretch;background:var(--card);
+    border:1.4px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:8px;}
+  .row .stub{flex:0 0 58px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:var(--card-2);position:relative;border-right:1.4px dashed var(--line);}
+  .row .stub::before,.row .stub::after{content:"";position:absolute;right:-6px;width:12px;height:12px;
+    border-radius:50%;background:var(--bg);}
+  .row .stub::before{top:-6px;} .row .stub::after{bottom:-6px;}
+  .row .dd{font-family:var(--f-mono);font-size:18px;font-weight:700;line-height:1;
+    font-variant-numeric:tabular-nums;}
+  .row .dw{font-size:9.5px;font-weight:700;color:var(--ink-3);text-transform:uppercase;margin-top:3px;
+    letter-spacing:.04em;}
+  .row .tags{display:flex;flex-wrap:wrap;align-content:center;gap:6px;flex:1;padding:10px 12px;}
+  .tag{font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:7px;color:#fff;white-space:nowrap;}
+  .tag.rl.sd{background:var(--rl);} .tag.rl.sn{background:var(--rl-n);}
+  .tag.wl.sd{background:var(--wl);} .tag.wl.sn{background:var(--wl-n);}
+  .tag.sv{background:var(--vac);}
   .tag.plan{background:none;color:var(--ink-3);border:1.4px dashed var(--line);}
-  .row.weekend .dd{color:#C0503E;}
-  .none{color:var(--ink-3);font-size:14px;font-weight:600;padding:8px 2px;}
+  .row.weekend .dd{color:var(--weekend);}
+  .note{font-size:11.5px;color:var(--ink-3);width:100%;padding:0 12px 9px;margin-top:-4px;line-height:1.4;}
+  .none{color:var(--ink-3);font-size:14px;font-weight:600;padding:10px 4px;}
 
-  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;padding-top:14px;
-    border-top:1px solid var(--line-2);font-size:12px;color:var(--ink-2);font-weight:600;align-items:center;}
-  .legend i{width:12px;height:12px;border-radius:4px;display:inline-block;margin-right:5px;vertical-align:-1px;}
-  .foot{margin-top:14px;font-size:11px;color:var(--ink-3);line-height:1.5;}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;padding-top:16px;
+    border-top:1px solid var(--line-2);font-size:11.5px;color:var(--ink-2);font-weight:600;align-items:center;}
+  .legend span{display:inline-flex;align-items:center;background:var(--card-2);border:1px solid var(--line);
+    border-radius:7px;padding:3px 8px 3px 6px;}
+  .legend i{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:5px;}
+  .foot{margin-top:12px;font-size:11px;color:var(--ink-3);line-height:1.55;}
 </style>
 </head>
 <body>
-  <div class="top"><h1>График смен</h1><span class="yr">2026</span></div>
+  <div class="eyebrow"><span class="lb">График смен</span><span class="yr" id="yrbadge"></span></div>
 
-  <div class="nav">
+  <div class="board">
     <button id="prev" aria-label="Предыдущий месяц">‹</button>
     <div class="mlabel" id="mlabel"></div>
     <button id="next" aria-label="Следующий месяц">›</button>
   </div>
 
-  <div class="cal" id="cal"></div>
+  <div id="swipezone">
+    <div class="cal" id="cal"></div>
 
-  <div class="list">
-    <h2 id="listtitle">Рабочие дни</h2>
-    <div id="rows"></div>
+    <div class="list">
+      <h2 id="listtitle">Рабочие дни</h2>
+      <div id="rows" class="rows-in"></div>
+    </div>
   </div>
 
   <div class="legend">
@@ -97,7 +140,7 @@
     <span><i style="background:#1668C7"></i>ВингЛайн ночь</span>
     <span><i style="background:#E8A317"></i>отпуск</span>
   </div>
-  <div class="foot">Пунктирная рамка / бледные полоски — план. Файл автономный, работает без интернета.</div>
+  <div class="foot">Пунктирная рамка / бледные полоски — план. Свайп влево-вправо листает месяц. Файл автономный, работает без интернета.</div>
 
 <script>
 const SHIFTS={"2026-01-01":{"wl":"day"},"2026-01-04":{"wl":"day"},"2026-01-07":{"wl":"day"},"2026-01-10":{"wl":"day"},"2026-01-13":{"wl":"day"},"2026-01-16":{"wl":"day"},"2026-01-19":{"wl":"day"},"2026-01-22":{"wl":"day"},"2026-01-25":{"wl":"day"},"2026-01-28":{"wl":"day"},"2026-01-31":{"wl":"day"},"2026-02-03":{"wl":"day"},"2026-02-06":{"wl":"day"},"2026-02-09":{"wl":"day"},"2026-02-12":{"wl":"day"},"2026-02-15":{"wl":"day"},"2026-02-18":{"wl":"day"},"2026-02-21":{"wl":"day"},"2026-02-24":{"wl":"day"},"2026-02-27":{"wl":"day"},"2026-03-02":{"wl":"day"},"2026-03-05":{"wl":"day"},"2026-03-08":{"wl":"day"},"2026-03-11":{"wl":"day"},"2026-03-14":{"wl":"day"},"2026-03-17":{"wl":"day"},"2026-03-20":{"wl":"day"},"2026-03-23":{"wl":"day"},"2026-03-26":{"wl":"day"},"2026-03-29":{"wl":"day"},"2026-04-01":{"wl":"day"},"2026-04-04":{"wl":"day"},"2026-04-07":{"wl":"day"},"2026-04-10":{"wl":"day"},"2026-04-13":{"wl":"day"},"2026-04-16":{"wl":"day"},"2026-04-19":{"wl":"day"},"2026-04-22":{"wl":"day"},"2026-04-25":{"wl":"day"},"2026-04-28":{"wl":"day"},"2026-05-01":{"wl":"day"},"2026-05-04":{"wl":"day"},"2026-05-07":{"wl":"day"},"2026-05-10":{"wl":"day"},"2026-05-13":{"wl":"day"},"2026-05-16":{"wl":"day"},"2026-05-19":{"wl":"day"},"2026-05-22":{"wl":"day"},"2026-05-25":{"wl":"day"},"2026-05-28":{"wl":"day"},"2026-05-31":{"wl":"day"},"2026-06-03":{"wl":"night"},"2026-06-06":{"wl":"night"},"2026-06-09":{"wl":"night"},"2026-06-12":{"wl":"night"},"2026-06-15":{"wl":"day"},"2026-06-18":{"wl":"day"},"2026-06-21":{"wl":"day"},"2026-06-24":{"wl":"day"},"2026-06-27":{"wl":"day"},"2026-06-30":{"wl":"night","carry":true},"2026-07-03":{"rl":"day","wl":"night"},"2026-07-06":{"wl":"night"},"2026-07-12":{"rl":"day","wl":"day"},"2026-07-15":{"wl":"night"},"2026-07-18":{"wl":"day"},"2026-07-24":{"rl":"day","wl":"night"},"2026-07-27":{"wl":"day"},"2026-07-30":{"wl":"day"},"2026-08-05":{"rl":"day","wl":"night","wlNote":"FEIK"},"2026-08-08":{"wl":"night","wlNote":"FEIK"},"2026-08-11":{"wl":"night","wlNote":"поиск отеля в новосибирске"},"2026-08-14":{"wl":"night","wlNote":"Красноярск Hainan, под утро WeChat и общение со скорпиусом(все это утром до 8 утра)"},"2026-08-17":{"rl":"day","wl":"night","wlNote":"Несма в Минске"},"2026-08-20":{"wl":"night","wlNote":"пробивал под Centrum обьемы - Лукойл(ты сказал запиши себе)"},"2026-08-23":{"wl":"night","wlNote":"в 4утра срочно делал и скидывал заявку в Хабаровск Ченду"},"2026-08-26":{"wl":"night","wlNote":"утренняя Несма с Астаной."},"2026-08-29":{"rl":"day","wl":"day","planned":true},"2026-09-01":{"wl":"day","planned":true},"2026-09-04":{"wl":"day","planned":true},"2026-09-07":{"wl":"day","planned":true},"2026-09-10":{"rl":"day","wl":"day","planned":true},"2026-09-13":{"wl":"day","planned":true},"2026-09-16":{"wl":"day","planned":true},"2026-09-19":{"wl":"day","planned":true},"2026-10-01":{"wl":"day","planned":true},"2026-10-04":{"rl":"day","wl":"day","planned":true},"2026-10-07":{"wl":"day","planned":true},"2026-10-10":{"wl":"day","planned":true},"2026-10-13":{"wl":"day","planned":true},"2026-10-16":{"rl":"day","wl":"day","planned":true},"2026-10-19":{"wl":"day","planned":true},"2026-10-22":{"wl":"day","planned":true},"2026-10-25":{"wl":"day","planned":true},"2026-10-28":{"rl":"day","wl":"day","planned":true},"2026-10-31":{"wl":"day","planned":true},"2026-11-03":{"wl":"day","planned":true},"2026-11-06":{"wl":"day","planned":true},"2026-11-09":{"rl":"day","wl":"day","planned":true},"2026-11-12":{"wl":"day","planned":true},"2026-11-15":{"wl":"day","planned":true},"2026-11-18":{"wl":"day","planned":true},"2026-11-21":{"rl":"day","wl":"day","planned":true},"2026-11-24":{"wl":"day","planned":true},"2026-11-27":{"wl":"day","planned":true},"2026-11-30":{"wl":"day","planned":true},"2026-12-03":{"rl":"day","wl":"day","planned":true},"2026-12-06":{"wl":"day","planned":true},"2026-12-09":{"wl":"day","planned":true},"2026-12-12":{"wl":"day","planned":true},"2026-12-15":{"rl":"day","wl":"day","planned":true},"2026-12-18":{"wl":"day","planned":true},"2026-12-21":{"wl":"day","planned":true},"2026-12-24":{"wl":"day","planned":true},"2026-12-27":{"rl":"day","wl":"day","planned":true},"2026-12-30":{"wl":"day","planned":true},"2026-07-04":{"rl":"day"},"2026-07-08":{"rl":"day"},"2026-07-11":{"rl":"day"},"2026-07-16":{"rl":"day"},"2026-07-20":{"rl":"day"},"2026-07-28":{"rl":"day"},"2026-08-01":{"rl":"day","planned":true},"2026-08-09":{"rl":"day","planned":true},"2026-08-13":{"rl":"day","planned":true},"2026-08-21":{"rl":"day","planned":true},"2026-08-25":{"rl":"day","wl":null},"2026-09-02":{"rl":"day","planned":true},"2026-09-06":{"rl":"day","wl":"day","wlNote":"За Тихона"},"2026-09-14":{"rl":"day","planned":true},"2026-09-18":{"rl":"day","planned":true},"2026-09-30":{"rl":"day","planned":true},"2026-10-08":{"rl":"day","planned":true},"2026-10-12":{"rl":"day","planned":true},"2026-10-20":{"rl":"day","planned":true},"2026-10-24":{"rl":"day","planned":true},"2026-11-01":{"rl":"day","planned":true},"2026-11-05":{"rl":"day","planned":true},"2026-11-13":{"rl":"day","planned":true},"2026-11-17":{"rl":"day","planned":true},"2026-11-25":{"rl":"day","planned":true},"2026-11-29":{"rl":"day","planned":true},"2026-12-07":{"rl":"day","planned":true},"2026-12-11":{"rl":"day","planned":true},"2026-12-19":{"rl":"day","planned":true},"2026-12-23":{"rl":"day","planned":true},"2026-12-31":{"rl":"day","planned":true},"2026-07-21":{"wl":"night"},"2026-07-09":{"wl":"day"},"2026-08-31":{"wl":"day","wlNote":"За Тихона"},"2026-08-02":{"wl":"night","wlNote":"Согласование отеля и списков 224 в иссыкуль в 12 ночи"},"2026-09-03":{"wl":"day","wlNote":"За Тихона"},"2026-09-12":{"wl":"day","wlNote":"За Тихона"},"2026-09-20":{"wl":"vac","rl":"vac"},"2026-09-21":{"wl":"vac","rl":"vac"},"2026-09-22":{"wl":"vac","rl":"vac"},"2026-09-23":{"wl":"vac","rl":"vac"},"2026-09-24":{"wl":"vac","rl":"vac"},"2026-09-25":{"wl":"vac","rl":"vac"},"2026-09-26":{"wl":"vac","rl":"vac"},"2026-09-27":{"wl":"vac","rl":"vac"},"2026-09-28":{"wl":"vac","rl":"vac"},"2026-09-29":{"wl":"vac","rl":"vac"}};
@@ -108,20 +151,24 @@ const DOWL=["пн","вт","ср","чт","пт","сб","вс"];
 const key=(y,m,d)=>`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 const label={rl:{day:"РусЛайн день",night:"РусЛайн ночь",vac:"РусЛайн отпуск"},
              wl:{day:"ВингЛайн день",night:"ВингЛайн ночь",vac:"ВингЛайн отпуск"}};
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+document.getElementById('yrbadge').textContent = YEAR;
 let m = (new Date().getFullYear()===YEAR) ? new Date().getMonth() : 7;
 
-function bar(v,who){ return v ? `<div class="bar ${who} ${v}"></div>` : `<div class="bar"></div>`; }
+const SCLASS={day:'sd',night:'sn',vac:'sv'};
+function bar(v,who){ return v ? `<div class="bar ${who} ${SCLASS[v]}"></div>` : `<div class="bar"></div>`; }
 
 function render(){
   document.getElementById('mlabel').textContent = MONTHS[m]+' '+YEAR;
+  document.getElementById('prev').disabled = (m===0);
+  document.getElementById('next').disabled = (m===11);
   const now=new Date();
   const first=new Date(YEAR,m,1);
   const lead=(first.getDay()+6)%7;
   const days=new Date(YEAR,m+1,0).getDate();
   const tk=key(now.getFullYear(),now.getMonth(),now.getDate());
 
-  // календарь
   let cal=DOW.map(d=>`<div class="dow">${d}</div>`).join('');
   for(let i=0;i<lead;i++) cal+='<div class="day blank"></div>';
   for(let d=1;d<=days;d++){
@@ -131,28 +178,47 @@ function render(){
     cal+=`<div class="day${k===tk?' today':''}${off?' off':''}${s.planned?' planned':''}${dow>=5?' weekend':''}">
       <div class="dnum">${d}</div>${bar(s.rl,'rl')}${bar(s.wl,'wl')}</div>`;
   }
-  document.getElementById('cal').innerHTML=cal;
+  const calEl=document.getElementById('cal');
+  calEl.innerHTML=cal;
 
-  // список рабочих дней
   let rows='';
   for(let d=1;d<=days;d++){
     const k=key(YEAR,m,d), s=SHIFTS[k];
     if(!s||(!s.rl&&!s.wl)) continue;
     const dow=(new Date(YEAR,m,d).getDay()+6)%7;
     let tags='';
-    if(s.rl) tags+=`<span class="tag rl ${s.rl}">${label.rl[s.rl]}</span>`;
-    if(s.wl) tags+=`<span class="tag wl ${s.wl}">${label.wl[s.wl]}</span>`;
+    if(s.rl) tags+=`<span class="tag rl ${SCLASS[s.rl]}">${label.rl[s.rl]}</span>`;
+    if(s.wl) tags+=`<span class="tag wl ${SCLASS[s.wl]}">${label.wl[s.wl]}</span>`;
     if(s.planned) tags+=`<span class="tag plan">план</span>`;
     rows+=`<div class="row${dow>=5?' weekend':''}">
-      <div class="d"><div class="dd">${d}</div><div class="dw">${DOWL[dow]}</div></div>
+      <div class="stub"><div class="dd">${d}</div><div class="dw">${DOWL[dow]}</div></div>
       <div class="tags">${tags}</div></div>`;
   }
-  document.getElementById('rows').innerHTML = rows || `<div class="none">В этом месяце смен нет.</div>`;
+  const rowsEl=document.getElementById('rows');
+  rowsEl.innerHTML = rows || `<div class="none">В этом месяце смен нет.</div>`;
   document.getElementById('listtitle').textContent='Рабочие дни · '+MONTHS[m];
+
+  if(!reduceMotion){
+    calEl.classList.remove('cal'); void calEl.offsetWidth; calEl.classList.add('cal');
+    rowsEl.classList.remove('rows-in'); void rowsEl.offsetWidth; rowsEl.classList.add('rows-in');
+  }
 }
 
 document.getElementById('prev').onclick=()=>{ if(m>0){m--;render();} };
 document.getElementById('next').onclick=()=>{ if(m<11){m++;render();} };
+
+// свайп влево/вправо листает месяц
+const zone=document.getElementById('swipezone');
+let tx=0, ty=0;
+zone.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX; ty=e.touches[0].clientY; },{passive:true});
+zone.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)*1.4){
+    if(dx<0 && m<11){ m++; render(); }
+    else if(dx>0 && m>0){ m--; render(); }
+  }
+},{passive:true});
+
 render();
 </script>
 </body>
