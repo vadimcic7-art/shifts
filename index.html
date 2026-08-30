@@ -65,7 +65,7 @@
   .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:16px;}
   .dow{font-size:10.5px;font-weight:700;letter-spacing:.06em;color:var(--ink-3);
     text-transform:uppercase;text-align:center;padding-bottom:3px;}
-  .day{background:var(--card);border:1.4px solid var(--line);border-radius:10px;
+  .day{position:relative;background:var(--card);border:1.4px solid var(--line);border-radius:10px;
     min-height:54px;padding:5px 5px 6px;display:flex;flex-direction:column;gap:3px;}
   .day.blank{background:none;border:none;}
   .day.off{background:var(--line-2);}
@@ -104,8 +104,14 @@
   .tag.sv{background:var(--vac);}
   .tag.plan{background:none;color:var(--ink-3);border:1.4px dashed var(--line);}
   .row.weekend .dd{color:var(--weekend);}
-  .note{font-size:11.5px;color:var(--ink-3);width:100%;padding:0 12px 9px;margin-top:-4px;line-height:1.4;}
+  .row-body{display:flex;flex-direction:column;flex:1;min-width:0;}
+  .note{font-size:12px;color:var(--ink-2);line-height:1.45;padding:0 12px 10px;
+    display:flex;gap:6px;align-items:flex-start;}
+  .note .ic{flex:0 0 auto;opacity:.55;font-size:11px;line-height:1.6;}
   .none{color:var(--ink-3);font-size:14px;font-weight:600;padding:10px 4px;}
+  .dnote{position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--chrome-2);}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dnote{background:#7A94E0;}}
+  :root[data-theme="dark"] .dnote{background:#7A94E0;}
 
   .legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;padding-top:16px;
     border-top:1px solid var(--line-2);font-size:11.5px;color:var(--ink-2);font-weight:600;align-items:center;}
@@ -149,6 +155,7 @@ const MONTHS=["Январь","Февраль","Март","Апрель","Май"
 const DOW=["ПН","ВТ","СР","ЧТ","ПТ","СБ","ВС"];
 const DOWL=["пн","вт","ср","чт","пт","сб","вс"];
 const key=(y,m,d)=>`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const label={rl:{day:"РусЛайн день",night:"РусЛайн ночь",vac:"РусЛайн отпуск"},
              wl:{day:"ВингЛайн день",night:"ВингЛайн ночь",vac:"ВингЛайн отпуск"}};
 const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -176,6 +183,7 @@ function render(){
     const dow=(new Date(YEAR,m,d).getDay()+6)%7;
     const off=!s.rl&&!s.wl;
     cal+=`<div class="day${k===tk?' today':''}${off?' off':''}${s.planned?' planned':''}${dow>=5?' weekend':''}">
+      ${s.wlNote?'<div class="dnote" title="Есть заметка"></div>':''}
       <div class="dnum">${d}</div>${bar(s.rl,'rl')}${bar(s.wl,'wl')}</div>`;
   }
   const calEl=document.getElementById('cal');
@@ -190,9 +198,10 @@ function render(){
     if(s.rl) tags+=`<span class="tag rl ${SCLASS[s.rl]}">${label.rl[s.rl]}</span>`;
     if(s.wl) tags+=`<span class="tag wl ${SCLASS[s.wl]}">${label.wl[s.wl]}</span>`;
     if(s.planned) tags+=`<span class="tag plan">план</span>`;
+    const note = s.wlNote ? `<div class="note"><span class="ic">📝</span><span>${esc(s.wlNote)}</span></div>` : '';
     rows+=`<div class="row${dow>=5?' weekend':''}">
       <div class="stub"><div class="dd">${d}</div><div class="dw">${DOWL[dow]}</div></div>
-      <div class="tags">${tags}</div></div>`;
+      <div class="row-body"><div class="tags">${tags}</div>${note}</div></div>`;
   }
   const rowsEl=document.getElementById('rows');
   rowsEl.innerHTML = rows || `<div class="none">В этом месяце смен нет.</div>`;
