@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>График смен · 2026</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#161A20">
+<style>
+  :root{
+    --bg:#F5F6F8; --card:#FFFFFF;
+    --ink:#161A20; --ink-2:#5C6673; --ink-3:#98A2B0;
+    --line:#E3E7EC; --line-2:#EFF2F5;
+    --rl:#D42027; --rl-n:#243B6B; --wl:#0E9F6E; --wl-n:#1668C7; --vac:#E8A317;
+    --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#12151A; --card:#1B1F27; --ink:#F2F4F7; --ink-2:#A6B0BD; --ink-3:#6B7583;
+      --line:#2A2F3A; --line-2:#22262F; }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);
+    padding:16px 14px calc(24px + env(safe-area-inset-bottom));
+    max-width:520px;margin:0 auto;-webkit-text-size-adjust:100%;}
+
+  .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+  .top h1{font-size:19px;font-weight:800;margin:0;letter-spacing:-.01em;}
+  .top .yr{font-size:13px;font-weight:800;color:var(--ink-3);}
+
+  .nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
+  .nav button{flex:0 0 auto;width:46px;height:46px;border-radius:14px;border:1.5px solid var(--line);
+    background:var(--card);color:var(--ink);font-size:22px;font-weight:800;line-height:1;cursor:pointer;}
+  .nav button:active{background:var(--line-2);}
+  .nav .mlabel{flex:1;text-align:center;font-size:17px;font-weight:800;}
+
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .dow{font-size:11px;font-weight:800;letter-spacing:.03em;color:var(--ink-3);
+    text-transform:uppercase;text-align:center;padding-bottom:2px;}
+  .day{background:var(--card);border:1.4px solid var(--line);border-radius:11px;
+    min-height:52px;padding:5px 5px 6px;display:flex;flex-direction:column;gap:3px;}
+  .day.blank{background:none;border:none;}
+  .day.off{background:var(--line-2);}
+  .day.today{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink) inset;}
+  .dnum{font-size:12px;font-weight:800;color:var(--ink-3);line-height:1;}
+  .day.today .dnum{color:var(--ink);}
+  .day.weekend .dnum{color:#C0503E;}
+  .day.planned .bar{opacity:.45;}
+
+  .bar{height:10px;border-radius:4px;}
+  .bar.rl.day{background:var(--rl);} .bar.rl.night{background:var(--rl-n);}
+  .bar.wl.day{background:var(--wl);} .bar.wl.night{background:var(--wl-n);}
+  .bar.rl.vac,.bar.wl.vac{background:var(--vac);}
+
+  .list{margin-top:18px;}
+  .list h2{font-size:13px;font-weight:800;color:var(--ink-2);text-transform:uppercase;
+    letter-spacing:.04em;margin:0 0 8px;}
+  .row{display:flex;align-items:center;gap:10px;background:var(--card);border:1.4px solid var(--line);
+    border-radius:12px;padding:10px 12px;margin-bottom:7px;}
+  .row .d{flex:0 0 44px;text-align:center;}
+  .row .d .dd{font-size:17px;font-weight:800;line-height:1;}
+  .row .d .dw{font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;margin-top:2px;}
+  .row .tags{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
+  .tag{font-size:12px;font-weight:800;padding:4px 9px;border-radius:8px;color:#fff;white-space:nowrap;}
+  .tag.rl.day{background:var(--rl);} .tag.rl.night{background:var(--rl-n);}
+  .tag.wl.day{background:var(--wl);} .tag.wl.night{background:var(--wl-n);}
+  .tag.vac{background:var(--vac);}
+  .tag.plan{background:none;color:var(--ink-3);border:1.4px dashed var(--line);}
+  .row.weekend .dd{color:#C0503E;}
+  .none{color:var(--ink-3);font-size:14px;font-weight:600;padding:8px 2px;}
+
+  .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;padding-top:14px;
+    border-top:1px solid var(--line-2);font-size:12px;color:var(--ink-2);font-weight:600;align-items:center;}
+  .legend i{width:12px;height:12px;border-radius:4px;display:inline-block;margin-right:5px;vertical-align:-1px;}
+  .foot{margin-top:14px;font-size:11px;color:var(--ink-3);line-height:1.5;}
+</style>
+</head>
+<body>
+  <div class="top"><h1>График смен</h1><span class="yr">2026</span></div>
+
+  <div class="nav">
+    <button id="prev" aria-label="Предыдущий месяц">‹</button>
+    <div class="mlabel" id="mlabel"></div>
+    <button id="next" aria-label="Следующий месяц">›</button>
+  </div>
+
+  <div class="cal" id="cal"></div>
+
+  <div class="list">
+    <h2 id="listtitle">Рабочие дни</h2>
+    <div id="rows"></div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:#D42027"></i>РусЛайн день</span>
+    <span><i style="background:#243B6B"></i>РусЛайн ночь</span>
+    <span><i style="background:#0E9F6E"></i>ВингЛайн день</span>
+    <span><i style="background:#1668C7"></i>ВингЛайн ночь</span>
+    <span><i style="background:#E8A317"></i>отпуск</span>
+  </div>
+  <div class="foot">Пунктирная рамка / бледные полоски — план. Файл автономный, работает без интернета.</div>
+
+<script>
+const SHIFTS={"2026-01-01":{"wl":"day"},"2026-01-04":{"wl":"day"},"2026-01-07":{"wl":"day"},"2026-01-10":{"wl":"day"},"2026-01-13":{"wl":"day"},"2026-01-16":{"wl":"day"},"2026-01-19":{"wl":"day"},"2026-01-22":{"wl":"day"},"2026-01-25":{"wl":"day"},"2026-01-28":{"wl":"day"},"2026-01-31":{"wl":"day"},"2026-02-03":{"wl":"day"},"2026-02-06":{"wl":"day"},"2026-02-09":{"wl":"day"},"2026-02-12":{"wl":"day"},"2026-02-15":{"wl":"day"},"2026-02-18":{"wl":"day"},"2026-02-21":{"wl":"day"},"2026-02-24":{"wl":"day"},"2026-02-27":{"wl":"day"},"2026-03-02":{"wl":"day"},"2026-03-05":{"wl":"day"},"2026-03-08":{"wl":"day"},"2026-03-11":{"wl":"day"},"2026-03-14":{"wl":"day"},"2026-03-17":{"wl":"day"},"2026-03-20":{"wl":"day"},"2026-03-23":{"wl":"day"},"2026-03-26":{"wl":"day"},"2026-03-29":{"wl":"day"},"2026-04-01":{"wl":"day"},"2026-04-04":{"wl":"day"},"2026-04-07":{"wl":"day"},"2026-04-10":{"wl":"day"},"2026-04-13":{"wl":"day"},"2026-04-16":{"wl":"day"},"2026-04-19":{"wl":"day"},"2026-04-22":{"wl":"day"},"2026-04-25":{"wl":"day"},"2026-04-28":{"wl":"day"},"2026-05-01":{"wl":"day"},"2026-05-04":{"wl":"day"},"2026-05-07":{"wl":"day"},"2026-05-10":{"wl":"day"},"2026-05-13":{"wl":"day"},"2026-05-16":{"wl":"day"},"2026-05-19":{"wl":"day"},"2026-05-22":{"wl":"day"},"2026-05-25":{"wl":"day"},"2026-05-28":{"wl":"day"},"2026-05-31":{"wl":"day"},"2026-06-03":{"wl":"night"},"2026-06-06":{"wl":"night"},"2026-06-09":{"wl":"night"},"2026-06-12":{"wl":"night"},"2026-06-15":{"wl":"day"},"2026-06-18":{"wl":"day"},"2026-06-21":{"wl":"day"},"2026-06-24":{"wl":"day"},"2026-06-27":{"wl":"day"},"2026-06-30":{"wl":"night","carry":true},"2026-07-03":{"rl":"day","wl":"night"},"2026-07-06":{"wl":"night"},"2026-07-12":{"rl":"day","wl":"day"},"2026-07-15":{"wl":"night"},"2026-07-18":{"wl":"day"},"2026-07-24":{"rl":"day","wl":"night"},"2026-07-27":{"wl":"day"},"2026-07-30":{"wl":"day"},"2026-08-02":{"wl":"day","planned":true},"2026-08-05":{"rl":"day","wl":"day","planned":true},"2026-08-08":{"wl":"day","planned":true},"2026-08-11":{"wl":"day","planned":true},"2026-08-14":{"wl":"day","planned":true},"2026-08-17":{"rl":"day","wl":"day","planned":true},"2026-08-20":{"wl":"day","planned":true},"2026-08-23":{"wl":"day","planned":true},"2026-08-26":{"wl":"day","planned":true},"2026-08-29":{"rl":"day","wl":"day","planned":true},"2026-09-01":{"wl":"day","planned":true},"2026-09-04":{"wl":"day","planned":true},"2026-09-07":{"wl":"day","planned":true},"2026-09-10":{"rl":"day","wl":"day","planned":true},"2026-09-13":{"wl":"day","planned":true},"2026-09-16":{"wl":"day","planned":true},"2026-09-19":{"wl":"day","planned":true},"2026-09-22":{"rl":"day","wl":"day","planned":true},"2026-09-25":{"wl":"day","planned":true},"2026-09-28":{"wl":"day","planned":true},"2026-10-01":{"wl":"day","planned":true},"2026-10-04":{"rl":"day","wl":"day","planned":true},"2026-10-07":{"wl":"day","planned":true},"2026-10-10":{"wl":"day","planned":true},"2026-10-13":{"wl":"day","planned":true},"2026-10-16":{"rl":"day","wl":"day","planned":true},"2026-10-19":{"wl":"day","planned":true},"2026-10-22":{"wl":"day","planned":true},"2026-10-25":{"wl":"day","planned":true},"2026-10-28":{"rl":"day","wl":"day","planned":true},"2026-10-31":{"wl":"day","planned":true},"2026-11-03":{"wl":"day","planned":true},"2026-11-06":{"wl":"day","planned":true},"2026-11-09":{"rl":"day","wl":"day","planned":true},"2026-11-12":{"wl":"day","planned":true},"2026-11-15":{"wl":"day","planned":true},"2026-11-18":{"wl":"day","planned":true},"2026-11-21":{"rl":"day","wl":"day","planned":true},"2026-11-24":{"wl":"day","planned":true},"2026-11-27":{"wl":"day","planned":true},"2026-11-30":{"wl":"day","planned":true},"2026-12-03":{"rl":"day","wl":"day","planned":true},"2026-12-06":{"wl":"day","planned":true},"2026-12-09":{"wl":"day","planned":true},"2026-12-12":{"wl":"day","planned":true},"2026-12-15":{"rl":"day","wl":"day","planned":true},"2026-12-18":{"wl":"day","planned":true},"2026-12-21":{"wl":"day","planned":true},"2026-12-24":{"wl":"day","planned":true},"2026-12-27":{"rl":"day","wl":"day","planned":true},"2026-12-30":{"wl":"day","planned":true},"2026-07-04":{"rl":"day"},"2026-07-08":{"rl":"day"},"2026-07-11":{"rl":"day"},"2026-07-16":{"rl":"day"},"2026-07-20":{"rl":"day"},"2026-07-28":{"rl":"day"},"2026-08-01":{"rl":"day","planned":true},"2026-08-09":{"rl":"day","planned":true},"2026-08-13":{"rl":"day","planned":true},"2026-08-21":{"rl":"day","planned":true},"2026-08-25":{"rl":"day","planned":true},"2026-09-02":{"rl":"day","planned":true},"2026-09-06":{"rl":"day","planned":true},"2026-09-14":{"rl":"day","planned":true},"2026-09-18":{"rl":"day","planned":true},"2026-09-26":{"rl":"day","planned":true},"2026-09-30":{"rl":"day","planned":true},"2026-10-08":{"rl":"day","planned":true},"2026-10-12":{"rl":"day","planned":true},"2026-10-20":{"rl":"day","planned":true},"2026-10-24":{"rl":"day","planned":true},"2026-11-01":{"rl":"day","planned":true},"2026-11-05":{"rl":"day","planned":true},"2026-11-13":{"rl":"day","planned":true},"2026-11-17":{"rl":"day","planned":true},"2026-11-25":{"rl":"day","planned":true},"2026-11-29":{"rl":"day","planned":true},"2026-12-07":{"rl":"day","planned":true},"2026-12-11":{"rl":"day","planned":true},"2026-12-19":{"rl":"day","planned":true},"2026-12-23":{"rl":"day","planned":true},"2026-12-31":{"rl":"day","planned":true},"2026-07-21":{"wl":"night"},"2026-07-09":{"wl":"day"}};
+const YEAR=2026;
+const MONTHS=["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+const DOW=["ПН","ВТ","СР","ЧТ","ПТ","СБ","ВС"];
+const DOWL=["пн","вт","ср","чт","пт","сб","вс"];
+const key=(y,m,d)=>`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+const label={rl:{day:"РусЛайн день",night:"РусЛайн ночь",vac:"РусЛайн отпуск"},
+             wl:{day:"ВингЛайн день",night:"ВингЛайн ночь",vac:"ВингЛайн отпуск"}};
+
+let m = (new Date().getFullYear()===YEAR) ? new Date().getMonth() : 7;
+
+function bar(v,who){ return v ? `<div class="bar ${who} ${v}"></div>` : `<div class="bar"></div>`; }
+
+function render(){
+  document.getElementById('mlabel').textContent = MONTHS[m]+' '+YEAR;
+  const now=new Date();
+  const first=new Date(YEAR,m,1);
+  const lead=(first.getDay()+6)%7;
+  const days=new Date(YEAR,m+1,0).getDate();
+  const tk=key(now.getFullYear(),now.getMonth(),now.getDate());
+
+  // календарь
+  let cal=DOW.map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<lead;i++) cal+='<div class="day blank"></div>';
+  for(let d=1;d<=days;d++){
+    const k=key(YEAR,m,d), s=SHIFTS[k]||{};
+    const dow=(new Date(YEAR,m,d).getDay()+6)%7;
+    const off=!s.rl&&!s.wl;
+    cal+=`<div class="day${k===tk?' today':''}${off?' off':''}${s.planned?' planned':''}${dow>=5?' weekend':''}">
+      <div class="dnum">${d}</div>${bar(s.rl,'rl')}${bar(s.wl,'wl')}</div>`;
+  }
+  document.getElementById('cal').innerHTML=cal;
+
+  // список рабочих дней
+  let rows='';
+  for(let d=1;d<=days;d++){
+    const k=key(YEAR,m,d), s=SHIFTS[k];
+    if(!s||(!s.rl&&!s.wl)) continue;
+    const dow=(new Date(YEAR,m,d).getDay()+6)%7;
+    let tags='';
+    if(s.rl) tags+=`<span class="tag rl ${s.rl}">${label.rl[s.rl]}</span>`;
+    if(s.wl) tags+=`<span class="tag wl ${s.wl}">${label.wl[s.wl]}</span>`;
+    if(s.planned) tags+=`<span class="tag plan">план</span>`;
+    rows+=`<div class="row${dow>=5?' weekend':''}">
+      <div class="d"><div class="dd">${d}</div><div class="dw">${DOWL[dow]}</div></div>
+      <div class="tags">${tags}</div></div>`;
+  }
+  document.getElementById('rows').innerHTML = rows || `<div class="none">В этом месяце смен нет.</div>`;
+  document.getElementById('listtitle').textContent='Рабочие дни · '+MONTHS[m];
+}
+
+document.getElementById('prev').onclick=()=>{ if(m>0){m--;render();} };
+document.getElementById('next').onclick=()=>{ if(m<11){m++;render();} };
+render();
+</script>
+</body>
+</html>
